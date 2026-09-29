@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    id 'io.qameta.allure' version '4.3.0'
+}
+
+group = 'com.jasmynmedina'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    // Selenium
+    testImplementation 'org.seleniumhq.selenium:selenium-java:4.49.0'
+
+    // JUnit
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.1.3'
+
+    // Allure reporting
+    testImplementation 'io.qameta.allure:allure-junit5:2.29.1'
+}
+
+test {
+    useJUnitPlatform()
+
+    systemProperty 'browser', System.getProperty('browser', 'chrome')
+    systemProperty 'headless', System.getProperty('headless', 'false')
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
+}
+
+tasks.register('smokeTest', Test) {
+    useJUnitPlatform {
+        includeTags 'smoke'
+    }
+
+    systemProperty 'browser', System.getProperty('browser', 'chrome')
+    systemProperty 'headless', System.getProperty('headless', 'false')
+}
+
+tasks.register('regressionTest', Test) {
+    useJUnitPlatform {
+        includeTags 'regression'
+    }
+
+    systemProperty 'browser', System.getProperty('browser', 'chrome')
+    systemProperty 'headless', System.getProperty('headless', 'false')
+}

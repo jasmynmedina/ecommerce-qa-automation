@@ -1,0 +1,53 @@
+name: Regression Tests
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: "0 8 * * *"
+
+jobs:
+  regression-tests:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        browser:
+          - chrome
+          - firefox
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Give Gradle permission
+        run: chmod +x gradlew
+
+      - name: Run regression tests
+        run: >
+          ./gradlew regressionTest
+          -Dbrowser=${{ matrix.browser }}
+          -Dheadless=true
+
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-screenshots-${{ matrix.browser }}
+          path: build/screenshots/
+          if-no-files-found: ignore
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-results-${{ matrix.browser }}
+          path: build/reports/tests/
