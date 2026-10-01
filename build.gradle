@@ -20,6 +20,7 @@ dependencies {
 
     // Allure reporting
     testImplementation 'io.qameta.allure:allure-junit5:2.29.1'
+    testImplementation 'io.rest-assured:rest-assured:5.5.1'
 }
 
 test {
@@ -49,4 +50,14 @@ tasks.register('regressionTest', Test) {
 
     systemProperty 'browser', System.getProperty('browser', 'chrome')
     systemProperty 'headless', System.getProperty('headless', 'false')
+}
+
+tasks.register('apiTest', Test) {
+    useJUnitPlatform {
+        includeTags 'api'
+    }
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
 }
